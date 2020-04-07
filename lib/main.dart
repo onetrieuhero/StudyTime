@@ -46,12 +46,99 @@ class HomeScreen extends StatelessWidget{
   }
 }
 
-class TODO extends StatelessWidget{
+class TODO extends StatefulWidget{
+  @override
+  _TODOState createState() => _TODOState();
+}
+
+class _TODOState extends State<TODO> {
+
+  List<String> todoItems = [];
+
+  void addItems(String task){
+    if(task.length > 0){
+      setState(() => todoItems.add(task));
+    }
+  }
+
+  void removeItem(int index){
+    setState(() => todoItems.removeAt(index));
+  }
+
+  void promptRemoveItem(int index){
+    showDialog(context: context,
+    builder: (BuildContext context) {
+      return new AlertDialog(
+        title: new Text('Mark "${todoItems[index]}" as done?'),
+        actions: <Widget>[
+          new FlatButton(
+            child: new Text("Cancel"),
+            onPressed: () => Navigator.of(context).pop()
+          ),
+          new FlatButton(
+            child: new Text("Mark as done"),
+            onPressed: (){
+              removeItem(index);
+              Navigator.of(context).pop();
+            }
+          )
+        ]
+      );
+    });
+  }
+
+  Widget buildList(){
+    return new ListView.builder(
+      itemBuilder: (context, index){
+        if(index < todoItems.length){
+          return buildItems(todoItems[index], index);
+        }
+      },
+    );
+  }
+
+  Widget buildItems(String text, int index){
+    return new ListTile(
+      title: new Text(text),
+      onTap: () => promptRemoveItem(index)
+    );
+  }
+
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
         title: Text("To Do List"),
       ),
+      body: buildList(),
+      floatingActionButton: FloatingActionButton(
+          onPressed: addTodoScreen,
+          tooltip: "Adding Task",
+          child: Icon(Icons.add)
+      )
+    );
+  }
+
+  void addTodoScreen(){
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context){
+          return new Scaffold(
+            appBar: new AppBar(
+              title: Text("add a new task")
+            ),
+            body: new TextField(
+              autofocus: true,
+              onSubmitted: (val){
+                addItems(val);
+                Navigator.pop(context);
+              },
+              decoration: InputDecoration(
+                hintText: "Enter Task",
+              )
+            )
+          );
+        }
+      )
     );
   }
 }
