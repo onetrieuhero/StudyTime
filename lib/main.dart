@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
+List<String> todoItems = [];
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatefulWidget{
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context){
     return new MaterialApp(
       theme: ThemeData(primaryColor: Colors.red[400]),
@@ -11,7 +17,12 @@ class MyApp extends StatelessWidget{
   }
 }
 
-class HomeScreen extends StatelessWidget{
+class HomeScreen extends StatefulWidget{
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context){
     theme: ThemeData(primaryColor: Colors.red[400]);
     return new Scaffold(
@@ -53,7 +64,7 @@ class TODO extends StatefulWidget{
 
 class _TODOState extends State<TODO> {
 
-  List<String> todoItems = [];
+
 
   void addItems(String task){
     if(task.length > 0){
@@ -99,7 +110,7 @@ class _TODOState extends State<TODO> {
 
   Widget buildItems(String text, int index){
     return new ListTile(
-      title: new Text(text),
+      title: new Text(text, style: TextStyle(decoration: TextDecoration.underline, fontSize: 25)),
       onTap: () => promptRemoveItem(index)
     );
   }
