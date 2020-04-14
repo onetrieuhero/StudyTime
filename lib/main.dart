@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 List<String> todoItems = [];
@@ -11,7 +12,7 @@ class MyApp extends StatefulWidget{
 class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context){
     return new MaterialApp(
-      theme: ThemeData(primaryColor: Colors.red[400]),
+      theme: ThemeData(primaryColor: Colors.redAccent[100],),
       home: new HomeScreen()
     );
   }
@@ -24,8 +25,9 @@ class HomeScreen extends StatefulWidget{
 
 class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context){
-    theme: ThemeData(primaryColor: Colors.red[400]);
+
     return new Scaffold(
+
       appBar: AppBar(title: Text("Home")),
       drawer: Drawer(
         child: ListView(
@@ -35,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text("Menu",
                 style: TextStyle(fontSize: 30)),
               decoration: BoxDecoration(
-                color: Colors.red[400],
+                color: Colors.redAccent[100],
               )
             ),
             ListTile(
@@ -52,10 +54,127 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           ]
         )
-      )
+      ),
+        body: Builder(builder: (context) => Container(
+          alignment: Alignment.center,
+          child: FittedBox(
+              child: TimerWidget()
+          ),
+        ))
     );
   }
 }
+
+class TimerWidget extends StatefulWidget{
+
+  final Duration duration = Duration(minutes: 25);
+  final Duration tick = Duration(milliseconds: 250);
+
+
+  @override
+  _TimerWidgetState createState() => _TimerWidgetState();
+}
+
+class _TimerWidgetState extends State<TimerWidget>{
+  SnackBar _breakTime = SnackBar(content: Text("Break Time"));
+
+  Timer _timer;
+  Duration _duration;
+  Duration _tick;
+
+  Duration _countDown;
+  DateTime _endTime;
+  String _btext = "Start";
+  String _displayTime= "25:00";
+
+  void initState(){
+    setState((){
+
+      _duration = widget.duration ?? Duration(minutes: 25);
+      _tick = widget.tick ?? Duration(milliseconds: 250);
+
+    });
+    super.initState();
+  }
+
+  String displayTime(Duration time){
+    int min = time.inMinutes;
+    int sec = (time.inSeconds - (time.inMinutes * 60));
+    return '$min:${sec.toString().padLeft(2,"0")}';
+  }
+
+  void startTime(BuildContext context){
+    setState((){
+      _endTime = DateTime.now().add(_duration);
+      _displayTime = displayTime(_duration - _tick);
+
+      _btext = "Stop";
+      _timer = Timer.periodic(_tick, (Timer timer){
+        setState((){
+          _countDown = _endTime.difference(DateTime.now());
+          _displayTime = displayTime(_countDown);
+
+
+          if(DateTime.now().isAfter(_endTime)){
+            stopTime();
+            Scaffold.of(context).showSnackBar(_breakTime);
+          }
+        });
+      });
+    });
+  }
+
+  void stopTime() => setState(() {
+    _btext = "Reset";
+    _timer.cancel();
+  });
+
+  void resetTime() => setState((){
+    _countDown = _duration;
+    _displayTime = displayTime(_countDown);
+    _btext = "Start";
+  });
+
+  void buttonPress(BuildContext context){
+    if(_timer?.isActive ?? false){
+      stopTime();
+    }else{
+      if(_countDown == _duration){
+        startTime(context);
+      }else{
+        resetTime();
+
+      }
+    }
+  }
+
+
+
+  Widget build(BuildContext context){
+    return Stack(
+
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(mainAxisAlignment: MainAxisAlignment.center,
+            children:<Widget>[
+              Text(_displayTime, style: TextStyle(fontSize: 30)),
+            ]),
+            FlatButton(
+              color: Colors.redAccent[100],
+              child: Text(_btext),
+              shape:StadiumBorder(),
+              onPressed: () => buttonPress(context),
+            )
+          ],
+
+        ),
+      ]
+    );
+  }
+}
+
 
 class TODO extends StatefulWidget{
   @override
@@ -153,4 +272,5 @@ class _TODOState extends State<TODO> {
     );
   }
 }
+
 
