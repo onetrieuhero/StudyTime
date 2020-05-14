@@ -79,10 +79,10 @@ class _TimerWidgetState extends State<TimerWidget>{
   SnackBar _breakTime = SnackBar(content: Text("Break Time"));
 
   Timer _timer;
-  Duration _duration;
+  Duration _duration = Duration(minutes: 25);
   Duration _tick;
 
-  Duration _countDown;
+  Duration _countDown = Duration(minutes: 25);
   DateTime _endTime;
   String _btext = "Start";
   String _displayTime= "25:00";
@@ -152,8 +152,16 @@ class _TimerWidgetState extends State<TimerWidget>{
 
   Widget build(BuildContext context){
     return Stack(
-
+      alignment: AlignmentDirectional.center,
       children: <Widget>[
+        SizedBox(
+          height: 200,
+          width: 200,
+          child: CircularProgressIndicator(
+            value: _countDown.inMilliseconds / _duration.inMilliseconds,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.red[200]),
+          ),
+        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -167,6 +175,7 @@ class _TimerWidgetState extends State<TimerWidget>{
               shape:StadiumBorder(),
               onPressed: () => buttonPress(context),
             )
+
           ],
 
         ),
